@@ -1,3 +1,7 @@
+<?php
+session_start ();
+
+&useremailErr
 <html>
 <head>
     <meta charset="UTF-8">
