@@ -146,10 +146,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </p>
 
         </form>
-        <?php
+    <?php
     }
     ?>
-    
+
     </div>
 </div>
 </body>
