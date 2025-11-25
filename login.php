@@ -1,7 +1,58 @@
 <?php
 session_start ();
 
-&useremailErr
+$emailErr = $passwordErr = "";
+$email = $password =  "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST["txt_email"])) {
+    $emailErr = "Email is required";
+  } else {
+    $email = $_POST["txt_email"];
+  }
+  if (empty($_POST["txt_password"])) {
+    $passwordErr = "Password is required";
+  } else {
+    $password= $_POST["txt_password"];
+  }
+
+  if($emailErr == "" && $passwordErr == "" )
+  {
+    //We hashed passwords using   
+    //$hashed_password = password_hash($password,PASSWORD_DEFAULT);
+  	//References http://php.net/manual/en/function.password-verify.php
+  	require_once "includes/db_connect.php";
+  	$sQuery = "SELECT * FROM account WHERE email = '$email'  ";
+  	
+  	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    $Result = $conn->query($sQuery) ;
+    $userResults = $Result->fetch(PDO::FETCH_ASSOC);
+
+    if($userResults['email'] )//the user exists
+    {	
+    	$hashed_password = $userResults['password'];
+    	if(password_verify($password,$hashed_password))
+    	{
+    		$_SESSION['email'] = $email;
+    		header("Location: home.php?referer=login");
+    	}
+    	else
+    	{
+    		$Msg = "Password ERROR: Your credentials seem to be wrong. Try again or make sure you are a registered user!";
+       		echo $Msg;
+    	}
+    	
+    }else{
+       $Msg = "Email ERROR: Your credentials seem to be wrong. Try again or make sure you are a registered user!";
+       echo $Msg;
+    	
+    }
+  }
+  
+ }
+ ?>
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -49,6 +100,11 @@ session_start ();
 
 <body>
 
+<?php
+    $activemenu ="login";
+    include('includes/menu.php');
+?>
+
 <div class="container">
 
     <div class="left">
@@ -57,17 +113,30 @@ session_start ();
 
     <div class="right">
     <a href="signin.php"><button class="login-btn">Sign Up</button></a>
+    
+    <?php
+    if(isset($_SESSION['email']))
+    { 
+        echo "<h3 style=\"color:red\">You are already logged in</h3>";
+        
+    }//end if
+    else
+    {	  
+    ?>    
+
     <h1>Log In</h1>
 
-        <form metod=" post">
+        <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
         <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="email" name="txt_email" placeholder="Email" required>
+            <span class="error">* <?php echo $emailErr;?></span><br/><br/> 
         </div>
 
         <div class="input-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="password" name="txt_password" placeholder="Password" required>
+            <span class="error">* <?php echo $passwordErr;?></span><br/><br/> 
         </div>
 
         <button class="submit-btn">Log In</button>
@@ -77,6 +146,10 @@ session_start ();
         </p>
 
         </form>
+        <?php
+    }
+    ?>
+    
     </div>
 </div>
 </body>
