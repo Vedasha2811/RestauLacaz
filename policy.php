@@ -66,7 +66,7 @@
 <body>
     <header>
         <div class= "header">
-            <img src= "logo.png" class= "logo">
+            <img src= "headlogo.png" class= "logo">
         <h1>Privacy Policy</h1>
     </header>
     <main>
@@ -192,3 +192,4 @@
     </footer>
 </body>
 </html>
+
