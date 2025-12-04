@@ -33,7 +33,7 @@
 <div class="column">
         <strong>Support</strong><br>
         <a href="terms.php" style="color:black; text-decoration:none;">Terms and Condition</a><br>
-        <a href="privacy.php" style="color:black; text-decoration:none;">Privacy Policy</a>
+        <a href="policy.php" style="color:black; text-decoration:none;">Privacy Policy</a>
     </div>
 
     <div class="column">
