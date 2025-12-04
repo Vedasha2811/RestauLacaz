@@ -107,7 +107,6 @@ $result = $conn->query($sql);
                 $itemPrice = htmlspecialchars($row['Item_Price']);
                 $itemImage = htmlspecialchars($row['Item_Image']);
                 
-                // Fallback for missing images
                 $imagePath = "images/" . $itemImage;
 
                 echo "
