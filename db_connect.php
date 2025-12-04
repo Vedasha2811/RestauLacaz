@@ -1,19 +1,12 @@
 <?php
-
-$server_name = "localhost";
-$user_name = "root";
+$servername = "localhost";
+$username = "root";
 $password = "";
-$db_name = "restaulacaz_database";
-//$conn = mysqli_connect($server_name ,$user_name,$password , $db_name);
-try
-{
- $conn = new PDO("mysql:host=$server_name;dbname=$db_name", $user_name, $password);
+$dbname = "restaurant_db";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-catch(PDOException $e)
- {
-    echo  $e->getMessage();
- }
-
-
-
 ?>
