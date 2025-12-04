@@ -162,7 +162,9 @@
     </div>
 
     <div class="category">
+        <a href = "salad.php">
         <img src="images/salad.jpg">
+        </a>
         <p>Salad</p>
     </div>
 
