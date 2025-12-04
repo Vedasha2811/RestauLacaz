@@ -208,12 +208,12 @@ INSERT INTO `restaurant` (`Restaurant_ID`, `Restaurant_Name`, `Restaurant_Locati
 
 INSERT INTO `item` (`Item_ID`, `Item_Name`, `Item_Quantity`, `Item_Price`, `Item_Type`, `Item_Image`, `Restaurant_ID`) VALUES
 -- Chinese
-(101, 'Chicken Dumpling', 50, 165, 'salad', 'chinese1.png', 201),
-(102, 'Shrimp Fried Rice', 350, 255, 'salad', 'chinese2.png', 202),
-(103, 'Cabbage Spring Rolls', 320, 145, 'salad', 'chinese3.png', 203),
-(104, 'Fried Chicken Bao', 400, 225, 'salad', 'chinese4.png', 202),
-(105, 'Sweet Chilli Chicken', 375, 245, 'salad', 'chinese5.png', 201),
-(106, 'Veg Chow Mein', 120, 230, 'salad', 'chinese6.png', 203),
+(101, 'Chicken Dumpling', 50, 165, 'chinese', 'chinese1.png', 201),
+(102, 'Shrimp Fried Rice', 350, 255, 'chinese', 'chinese2.png', 202),
+(103, 'Cabbage Spring Rolls', 320, 145, 'chinese', 'chinese3.png', 203),
+(104, 'Fried Chicken Bao', 400, 225, 'chinese', 'chinese4.png', 202),
+(105, 'Sweet Chilli Chicken', 375, 245, 'chinese', 'chinese5.png', 201),
+(106, 'Veg Chow Mein', 120, 230, 'chinese', 'chinese6.png', 203),
 
 -- Seafood
 (201, 'Pawn and Mussel', 50, 400, 'seafood', 'sea1.png', 201),
