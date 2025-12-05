@@ -32,7 +32,7 @@
     
 <div class="column">
         <strong>Support</strong><br>
-        <a href="terms.php" style="color:black; text-decoration:none;">Terms and Condition</a><br>
+        <a href="TAC.php" style="color:black; text-decoration:none;">Terms and Condition</a><br>
         <a href="policy.php" style="color:black; text-decoration:none;">Privacy Policy</a>
     </div>
 
