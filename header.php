@@ -5,7 +5,7 @@
         .header {
             width: 100%;
             height: 250px;
-            background-image: url('images/background.png'); /* <-- change to your real image name */
+            background-image: url('images/background.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -28,6 +28,7 @@
             height: auto;
         }
     </style>
+
 
 
 
