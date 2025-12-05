@@ -1,6 +1,19 @@
 <?php
 session_start ();
 
+ 
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;  
+}
+
+$maxAttempts = 5;      // number of tries allowed
+$lockTime = 60;        // seconds (1 minute)
+
+if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
+    $remaining = $_SESSION['lock_time'] - time();
+    die("<p style='color:red;'>Too many attempts. Try again in $remaining seconds.</p>");
+}
+
 $emailErr = $passwordErr = "";
 $email = $password =  "";
 
@@ -29,29 +42,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Result = $conn->query($sQuery) ;
     $userResults = $Result->fetch(PDO::FETCH_ASSOC);
 
-    if($userResults['email'] )//the user exists
-    {	
-    	$hashed_password = $userResults['password'];
-    	if(password_verify($password,$hashed_password))
-    	{
-    		$_SESSION['email'] = $email;
-    		header("Location: home.php?referer=login");
-    	}
-    	else
-    	{
-    		$Msg = "Password ERROR: Your credentials seem to be wrong. Try again or make sure you are a registered user!";
-       		echo $Msg;
-    	}
-    	
-    }else{
-       $Msg = "Email ERROR: Your credentials seem to be wrong. Try again or make sure you are a registered user!";
-       echo $Msg;
-    	
+    if ($userResults['email']) // user found
+    {
+        $hashed_password = $userResults['password'];
+
+        if (password_verify($password, $hashed_password))
+        {
+            // ✔ Reset attempts after successful login
+            $_SESSION['attempts'] = 0;
+            unset($_SESSION['lock_time']);
+
+            $_SESSION['email'] = $email;
+            header("Location: home.php?referer=login");
+        }
+        else
+        {
+            // Wrong password → increase attempt counter
+            $_SESSION['attempts']++;
+
+            if ($_SESSION['attempts'] >= $maxAttempts) {
+                $_SESSION['lock_time'] = time() + $lockTime; // lock for 1 minute
+                echo "<p style='color:red;'>Too many incorrect attempts. Locked for $lockTime seconds.</p>";
+            } else {
+                echo "<p style='color:red;'>Wrong password. Attempts: {$_SESSION['attempts']}/$maxAttempts</p>";
+            }
+        }
     }
-  }
-  
- }
- ?>
+    else {
+      //EMAIL NOT FOUND → count attempt
+      $_SESSION['attempts']++;
+      if ($_SESSION['attempts'] >= $maxAttempts) {
+        $_SESSION['lock_time'] = time() + $lockTime;
+        echo "<p style='color:red;'>Too many incorrect attempts. Locked for $lockTime seconds.</p>";
+        } else {
+          echo "<p style='color:red;'>Email not found. Attempts: {$_SESSION['attempts']}/$maxAttempts</p>";
+          }
+        }
+    }
+}
+?>
 
 <html>
 <head>
