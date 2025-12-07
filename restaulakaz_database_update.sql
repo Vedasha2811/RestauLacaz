@@ -1,10 +1,9 @@
-@ -0,0 +1,325 @@
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 07, 2025 at 01:43 PM
+-- Generation Time: Dec 07, 2025 at 04:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,7 +46,7 @@ CREATE TABLE `customer` (
   `First_Name` varchar(50) DEFAULT NULL,
   `Last_Name` varchar(50) DEFAULT NULL,
   `email` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL
+  `password` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -134,8 +133,16 @@ CREATE TABLE `orders` (
   `Order_Status` varchar(50) DEFAULT NULL,
   `Region_Name` varchar(50) CHARACTER SET utf32 COLLATE utf32_general_ci DEFAULT NULL,
   `Street_Name` varchar(50) CHARACTER SET utf32 COLLATE utf32_german2_ci DEFAULT NULL,
+  `Phone` varchar(20) DEFAULT NULL,
   `Customer_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`Order_ID`, `Date`, `Time`, `Total_Amount`, `Order_Status`, `Region_Name`, `Street_Name`, `Phone`, `Customer_ID`) VALUES
+(0, '2025-12-07', '16:35:36', 1250.00, 'Pending', 'belair', 'rocky', '59181301', 0);
 
 -- --------------------------------------------------------
 
@@ -162,163 +169,6 @@ CREATE TABLE `restaurant` (
   `Restaurant_Name` varchar(100) DEFAULT NULL,
   `Restaurant_Location` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `restaurant`
---
-
-INSERT INTO `restaurant` (`Restaurant_ID`, `Restaurant_Name`, `Restaurant_Location`) VALUES
-(201, 'KFC', 'Mauritius'),
-(202, 'Mac', 'Mauritius'),
-(203, 'Tilly', 'Mauritius'),
-(204, 'Sitar', 'Grand Baie'),
-(205, 'Namaste', 'Port Louis'),
-(206, 'Felicita', 'Grand Baie');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `review`
---
-
-CREATE TABLE `review` (
-  `Review_ID` int(11) NOT NULL,
-  `Review_Commented` text DEFAULT NULL,
-  `Rating` int(11) DEFAULT NULL,
-  `Review_Date` date DEFAULT NULL,
-  `Customer_ID` int(11) DEFAULT NULL,
-  `Restaurant_ID` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`Admin_ID`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `password` (`password`);
-
---
--- Indexes for table `customer`
---
-ALTER TABLE `customer`
-  ADD PRIMARY KEY (`Customer_ID`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `password` (`password`);
-
---
--- Indexes for table `item`
---
-ALTER TABLE `item`
-  ADD PRIMARY KEY (`Item_ID`),
-  ADD KEY `Restaurant_ID` (`Restaurant_ID`);
-
---
--- Indexes for table `orders`
---
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`Order_ID`),
-  ADD KEY `Customer_ID` (`Customer_ID`);
-
---
--- Indexes for table `payment`
---
-ALTER TABLE `payment`
-  ADD PRIMARY KEY (`Payment_ID`),
-  ADD KEY `Order_ID` (`Order_ID`);
-
---
--- Indexes for table `restaurant`
---
-ALTER TABLE `restaurant`
-  ADD PRIMARY KEY (`Restaurant_ID`);
-
---
--- Indexes for table `review`
---
-ALTER TABLE `review`
-  ADD PRIMARY KEY (`Review_ID`),
-  ADD KEY `Customer_ID` (`Customer_ID`),
-  ADD KEY `Restaurant_ID` (`Restaurant_ID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `Admin_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `customer`
---
-ALTER TABLE `customer`
-  MODIFY `Customer_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `item`
---
-ALTER TABLE `item`
-  MODIFY `Item_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=806;
-
---
--- AUTO_INCREMENT for table `orders`
---
-ALTER TABLE `orders`
-  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `payment`
---
-ALTER TABLE `payment`
-  MODIFY `Payment_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `restaurant`
---
-ALTER TABLE `restaurant`
-  MODIFY `Restaurant_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=207;
-
---
--- AUTO_INCREMENT for table `review`
---
-ALTER TABLE `review`
-  MODIFY `Review_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `item`
---
-ALTER TABLE `item`
-  ADD CONSTRAINT `item_ibfk_1` FOREIGN KEY (`Restaurant_ID`) REFERENCES `restaurant` (`Restaurant_ID`);
-
---
--- Constraints for table `orders`
---
-ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`Customer_ID`) REFERENCES `customer` (`Customer_ID`);
-
---
--- Constraints for table `payment`
---
-ALTER TABLE `payment`
-  ADD CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`Order_ID`) REFERENCES `orders` (`Order_ID`);
-
---
--- Constraints for table `review`
---
-ALTER TABLE `review`
-  ADD CONSTRAINT `review_ibfk_1` FOREIGN KEY (`Customer_ID`) REFERENCES `customer` (`Customer_ID`),
-  ADD CONSTRAINT `review_ibfk_2` FOREIGN KEY (`Restaurant_ID`) REFERENCES `restaurant` (`Restaurant_ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

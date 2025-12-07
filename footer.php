@@ -40,7 +40,6 @@
         <strong>Company</strong><br>
         <a href="about.php" style="color:black; text-decoration:none;">About Us</a><br>
         <a href="faqs.php" style="color:black; text-decoration:none;">FAQs</a><br>
-        <a href="about.php" style="color:black; text-decoration:none;">Contact</a>
     </div>
 
     <div class="column">
@@ -53,4 +52,5 @@
     <div style="text-align:center; padding:10px; background:#a05b3d; color:#fff;">
         ©2025 RestauLacaz. All Rights Reserved.
     </div>
+
 

@@ -1,3 +1,4 @@
+n.php (corrected login with lockout)
 <?php
 session_start();
 require_once "includes/db_connect.php";
@@ -164,3 +165,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 </body>
 </html>
+
