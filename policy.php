@@ -17,7 +17,7 @@
         header {
              width: 100%;
             height: 250px;
-            background-image: url('background.png'); 
+            background-image: url('home background.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -66,7 +66,7 @@
 <body>
     <header>
         <div class= "header">
-            <img src= "headlogo.png" class= "logo">
+            <img src= "logo.png" class= "logo">
         <h1>Privacy Policy</h1>
     </header>
     <main>
@@ -192,4 +192,5 @@
     </footer>
 </body>
 </html>
+
 
