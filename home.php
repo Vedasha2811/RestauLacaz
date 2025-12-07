@@ -1,7 +1,3 @@
-<?php
-// home.php
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +11,6 @@
             background: #ffffff;
         }
 
-        /* HEADER */
         header {
             background: #a05b3d;
             display: flex;
@@ -34,7 +29,6 @@
             color: black;
         }
 
-        /* HERO SECTION */
         .hero {
             background-image: url('images/home background.jpg');
             background-size: cover;
@@ -52,7 +46,6 @@
             margin: 5px 0;
         }
 
-        /* Food Categories */
         .section-title {
             font-size: 25px;
             margin: 40px 0 20px 40px;
@@ -80,7 +73,6 @@
             font-size: 18px;
         }
 
-        /* Reviews */
         .reviews {
             margin: 40px 40px;
         }
@@ -112,7 +104,6 @@
 
 <body>
 
-<!-- HEADER -->
 <header>
     <a href="home.php">
         <img src="images/logo.png" alt="RestauLakaz Logo">
@@ -124,63 +115,75 @@
     </nav>
 </header>
 
-<!-- HERO -->
 <div class="hero">
     <h1>RestauLakaz</h1>
     <p>We Deliver For You</p>
     <p>Kan nu la zero traka Pas bouZ nou vin kiT</p>
 </div>
 
-<!-- FOOD CATEGORIES -->
 <div class="section-title">Food Categories</div>
 
 <div class="category-container">
 
     <div class="category">
-        <img src="images/Italian.jpg">
-        <p>Italian</p>
+        <a href="italian.php">
+            <img src="images/Italian.jpg">
+             <p>Italian</p>
+        </a>
     </div>
 
     <div class="category">
-        <img src="images/Indian.jpg">
-        <p>Indian</p>
+        <a href="indian.php">
+            <img src="images/Indian.jpg">
+            <p>Indian</p>
+        </a>
     </div>
 
     <div class="category">
-        <img src="images/chinese.jpg">
-        <p>Chinese</p>
+        <a href="chinese.php">
+            <img src="images/chinese.jpg">
+            <p>Chinese</p>
+        </a>
     </div>
 
     <div class="category">
-        <img src="images/seafood.jpg">
-        <p>Seafood</p>
+        <a href="seafood.php">
+            <img src="images/seafood.jpg">
+            <p>Seafood</p>
+        </a>
     </div>
 
     <div class="category">
-        <img src="images/fastfood.jpg">
-        <p>Fast Food</p>
+        <a href="fastfood.php">
+            <img src="images/fastfood.jpg">
+            <p>Fast Food</p>
+        </a>
     </div>
 
     <div class="category">
         <a href = "salad.php">
-        <img src="images/salad.jpg">
+            <img src="images/salad.jpg">
+            <p>Salad</p>
         </a>
-        <p>Salad</p>
+       
     </div>
 
     <div class="category">
-        <img src="images/drinks.jpg">
-        <p>Drinks</p>
+        <a href = "drinks.php">
+            <img src="images/drinks.jpg">
+            <p>Drinks</p>
+        </a>
     </div>
 
     <div class="category">
-        <img src="images/dessert.jpg">
-        <p>Dessert</p>
+        <a href = "dessert.php">
+            <img src="images/dessert.jpg">
+            <p>Dessert</p>
+        </a>
     </div>
 
 </div>
 
-<!-- REVIEWS -->
 <div class="reviews">
     <h2>Review</h2>
 
@@ -217,7 +220,6 @@
     </div>
 </div>
 
-<!-- FOOTER -->
 <?php include("footer.php"); ?>
 
 </body>
