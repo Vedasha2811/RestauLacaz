@@ -1,24 +1,25 @@
 <?php
 session_start();
 
-$firstnameErr = $lastnameErr = $emailErr = $passwordErr = "";
-$firstname = $lastname = $email = $password = "";
+$firstnameErr = $lastnameErr = $emailErr = $passwordErr = $confirmPasswordErr = "";
+$firstname = $lastname = $email = $password = $confirmPassword = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-  if (empty($_POST["txt_firstname"])) {
+    //Validate first name
+  if (empty($_POST["txt_firstname"]) &&preg_match("/^a-zA-Z0-9+$/", $_POST["txt_firstname"])) {
     $firstnameErr = "First name is required";
   } else {
     $firstname = ($_POST["txt_firstname"]);
   }
 
-
-  if (empty($_POST["txt_lastname"])) {
+    // Validate last name
+  if (empty($_POST["txt_lastname"]) && preg_match("/^a-zA-Z0-9+$/", $_POST["txt_lastname"])) {
     $lastnameErr = "Last name is required";
   } else {
     $lastname = ($_POST["txt_lastname"]);
   }
 
+    // Validate email
   if (empty($_POST["txt_email"])) {
     $emailErr = "Email is required";
   } else {
@@ -28,14 +29,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+    // Validate password
+    if (empty($_POST["txt_password"])) {
+        $passwordErr = "Password is required";
+    } else {
+        $password = trim($_POST["txt_password"]);
+    }
 
-  if (empty($_POST["txt_password"])) {
-    $passwordErr = "Password is required";
-  } else {
-    $password = trim($_POST["txt_password"]);
-  }
+    // Validate confirm password
+    if (empty($_POST["txt_confirmpassword"])) {
+        $confirmPasswordErr = "Confirm Password is required";
+    } else {
+        $confirmPassword = trim($_POST["txt_confirmpassword"]);
+        
+        if (!empty($password) && $password !== $confirmPassword) {
+            $confirmPasswordErr = "Passwords do not match";
+        }
+    }
 
-  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == "") 
+
+
+  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == ""&& $confirmPasswordErr == "") 
 {
     // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -57,6 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($stmt->execute()) {
         echo "Success!";
+        header("Location: home.php?referer=signin");
+        exit();
     } else {
         echo "ERROR: Could not save credentials!";
     }
@@ -210,8 +226,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" name="txt_confirm_password" placeholder="Reenter Your Password"required>
+            <label for="password">Confirm Password</label>
+            <input type="password" name="txt_confirmpassword" placeholder="Reenter Your Password" required>
+        </label>
         </div>
 
         <button class="submit-btn">Sign Up</button>
@@ -228,4 +245,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 </body>
-</html>                 WHY NOT WORKING?
+</html>
