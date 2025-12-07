@@ -1,7 +1,6 @@
 <?php
-include 'includes/db_connect.php'; // your database connection file
+include 'includes/db_connect.php';
 
-// Fetch only seafood items (Item_Type = 'seafood')
 $sql = "SELECT * FROM Item WHERE Item_Type = 'seafood'";
 $result = $conn->query($sql);
 ?>
@@ -74,27 +73,69 @@ $result = $conn->query($sql);
         color: #fff;
     }
 
+    
     .header {
         background-color: #a05b3d;
         padding: 20px;
-        text-align: center;
         font-size: 28px;
         font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
-        display: flex;    
     }
 
-    .logo {
+
+    .header .logo {
         width: 90px;
         height: auto;
-    }       
+        position: absolute;
+        left: 20px;
+    }
+
+   
+    .checkout-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        right: 30px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .checkout-box a {
+        text-decoration: none;
+        color: #000;
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .checkout-box img {
+        width: 35px;
+        height: auto;
+    }
+
 </style>
 
 <body>
 
    <div class="header">
         <img src="images/logo.png" class="logo">
+
         <h1>Seafood</h1>
+
+        <!-- Cart + Checkout -->
+        <div class="checkout-box">
+            <a href="checkout.php">
+                <img src="images/cart.png" alt="Cart">
+                <span>Checkout</span>
+            </a>
+        </div>
     </div>
 
 <div class="container">
