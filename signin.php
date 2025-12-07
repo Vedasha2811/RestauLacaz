@@ -28,34 +28,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+    if (empty($_POST["txt_password"])) {
+        $passwordErr = "Password is required";
+    } else {
+        $password = trim($_POST["txt_password"]);
+    }
 
-  if (empty($_POST["txt_password"])) {
-    $passwordErr = "Password is required";
-  } else {
-    $password = trim($_POST["txt_password"]);
+    if (empty($_POST["txt_confirm_password"])) {
+        $confirmPasswordErr = "Please confirm your password";
+    } else {
+        $confirm_password = trim($_POST["txt_confirm_password"]);
+    }
+
+
+    if (empty($passwordErr) && empty($confirmPasswordErr)) {
+        if ($password !== $confirm_password) {
+            $confirmPasswordErr = "Passwords do not match";
+        }
+    }
+
+
   }
+  
+  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == "" && $confirmPasswordErr ==   "") 
+{
+    // Hash password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == "") 
-  {
-  	
-    $hashed_password = password_hash($password,PASSWORD_DEFAULT);
-  	require_once "includes/db_connect.php";
-  	$sInsert = "INSERT INTO account  (firstname, lastname, email, password) VALUES( '$firstname', '$lastname', '$email', '$hashed_password') ";
-  	#echo $sQuery;
-  	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    require_once "includes/db_connect.php";
+    $stmt = $conn->prepare("
+    INSERT INTO customer (First_Name, Last_Name, email, password)
+    VALUES (:firstname, :lastname, :email, :password)
+    ");
+
+    $stmt->bindParam(':firstname', $firstname);
+    $stmt->bindParam(':lastname', $lastname);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':password', $hashed_password);
+
     
-    $Result = $conn->exec($sInsert) ; 
-
-    if($Result )
-    {	
-    	$Msg = "!Success";
-	    echo $Msg;
-    }else{
-       $Msg = "ERROR: Your credentials could not be saved!";
-       echo $Msg;
+    if ($stmt->execute()) {
+        echo "Success!";
+    } else {
+        echo "ERROR: Could not save credentials!";
     }
 }
-}
+
+  
+
+
+
 ?>
 
 <html>
