@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
+<<<<<<< HEAD
 -- Generation Time: Dec 07, 2025 at 01:59 PM
+=======
+-- Generation Time: Dec 07, 2025 at 01:43 PM
+>>>>>>> a6bee6553eac0c194c81ebd7b8ed76b0be8123cf
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -46,7 +50,11 @@ CREATE TABLE `customer` (
   `First_Name` varchar(50) DEFAULT NULL,
   `Last_Name` varchar(50) DEFAULT NULL,
   `email` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
+<<<<<<< HEAD
   `password` varchar(255) NOT NULL
+=======
+  `password` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL
+>>>>>>> a6bee6553eac0c194c81ebd7b8ed76b0be8123cf
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
