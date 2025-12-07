@@ -42,9 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     require_once "includes/db_connect.php";
     $stmt = $conn->prepare("
-        INSERT INTO customer (firstname, lastname, email, password)
-        VALUES (:firstname, :lastname, :email, :password)
+    INSERT INTO customer (First_Name, Last_Name, email, password)
+    VALUES (:firstname, :lastname, :email, :password)
     ");
+
+ 
 
 
     $stmt->bindParam(':firstname', $firstname);
