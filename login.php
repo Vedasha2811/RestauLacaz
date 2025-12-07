@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //$hashed_password = password_hash($password,PASSWORD_DEFAULT);
   	//References http://php.net/manual/en/function.password-verify.php
   	require_once "includes/db_connect.php";
-  	$sQuery = "SELECT * FROM account WHERE email = '$email'  ";
+  	$sQuery = "SELECT * FROM customer WHERE email = '$email'  ";
   	
   	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
