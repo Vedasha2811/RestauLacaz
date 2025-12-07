@@ -66,7 +66,7 @@
 <body>
     <header>
         <div class= "header">
-            <img src= "headlogo.png" class= "logo">
+             <img src="images/logo.png" alt="RestauLakaz Logo" class="logo" />
         <h1>Privacy Policy</h1>
     </header>
     <main>
@@ -192,5 +192,6 @@
     </footer>
 </body>
 </html>
+
 
 
