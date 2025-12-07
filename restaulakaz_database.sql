@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2025 at 05:45 PM
+-- Generation Time: Dec 07, 2025 at 01:59 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,7 +31,8 @@ CREATE TABLE `admin` (
   `Admin_ID` int(11) NOT NULL,
   `First_Name` varchar(50) DEFAULT NULL,
   `Last_Name` varchar(50) DEFAULT NULL,
-  `Username` varchar(50) DEFAULT NULL
+  `email` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
+  `password` int(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -44,10 +45,8 @@ CREATE TABLE `customer` (
   `Customer_ID` int(11) NOT NULL,
   `First_Name` varchar(50) DEFAULT NULL,
   `Last_Name` varchar(50) DEFAULT NULL,
-  `Phone_Number` varchar(20) DEFAULT NULL,
-  `Address` varchar(255) DEFAULT NULL,
-  `Region_Name` varchar(100) DEFAULT NULL,
-  `Street_Name` varchar(100) DEFAULT NULL
+  `email` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
+  `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -132,6 +131,8 @@ CREATE TABLE `orders` (
   `Time` time DEFAULT NULL,
   `Total_Amount` decimal(10,2) DEFAULT NULL,
   `Order_Status` varchar(50) DEFAULT NULL,
+  `Region_Name` varchar(50) CHARACTER SET utf32 COLLATE utf32_general_ci DEFAULT NULL,
+  `Street_Name` varchar(50) CHARACTER SET utf32 COLLATE utf32_german2_ci DEFAULT NULL,
   `Customer_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -188,17 +189,6 @@ CREATE TABLE `review` (
   `Restaurant_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `user`
---
-
-CREATE TABLE `user` (
-  `Username` varchar(50) NOT NULL,
-  `Password` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Indexes for dumped tables
 --
@@ -208,13 +198,16 @@ CREATE TABLE `user` (
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`Admin_ID`),
-  ADD KEY `Username` (`Username`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `password` (`password`);
 
 --
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
-  ADD PRIMARY KEY (`Customer_ID`);
+  ADD PRIMARY KEY (`Customer_ID`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `password` (`password`);
 
 --
 -- Indexes for table `item`
@@ -252,12 +245,6 @@ ALTER TABLE `review`
   ADD KEY `Restaurant_ID` (`Restaurant_ID`);
 
 --
--- Indexes for table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`Username`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -271,7 +258,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `Customer_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Customer_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -306,12 +293,6 @@ ALTER TABLE `review`
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `admin`
---
-ALTER TABLE `admin`
-  ADD CONSTRAINT `admin_ibfk_1` FOREIGN KEY (`Username`) REFERENCES `user` (`Username`);
 
 --
 -- Constraints for table `item`
