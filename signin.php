@@ -28,38 +28,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
-    if (empty($_POST["txt_password"])) {
-        $passwordErr = "Password is required";
-    } else {
-        $password = trim($_POST["txt_password"]);
-    }
 
-    if (empty($_POST["txt_confirm_password"])) {
-        $confirmPasswordErr = "Please confirm your password";
-    } else {
-        $confirm_password = trim($_POST["txt_confirm_password"]);
-    }
-
-
-    if (empty($passwordErr) && empty($confirmPasswordErr)) {
-        if ($password !== $confirm_password) {
-            $confirmPasswordErr = "Passwords do not match";
-        }
-    }
-
-
+  if (empty($_POST["txt_password"])) {
+    $passwordErr = "Password is required";
+  } else {
+    $password = trim($_POST["txt_password"]);
   }
-  
-  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == "" && $confirmPasswordErr ==   "") 
+
+  if ($firstnameErr == "" && $lastnameErr == "" && $emailErr == "" && $passwordErr == "") 
 {
     // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     require_once "includes/db_connect.php";
     $stmt = $conn->prepare("
-    INSERT INTO customer (First_Name, Last_Name, email, password)
-    VALUES (:firstname, :lastname, :email, :password)
+        INSERT INTO customer (firstname, lastname, email, password)
+        VALUES (:firstname, :lastname, :email, :password)
     ");
+
 
     $stmt->bindParam(':firstname', $firstname);
     $stmt->bindParam(':lastname', $lastname);
@@ -77,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   
 
 
-
+}
 ?>
 
 <html>
@@ -240,4 +226,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 </body>
-</html>
+</html>                 WHY NOT WORKING?
