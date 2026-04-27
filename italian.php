@@ -1,28 +1,23 @@
 <?php
-include 'includes/db_connect.php'; // your database connection file
+include 'includes/db_connect.php';
 
-// Fetch only italian (Item_Type = 'italian')
+// Fetch italian items
 $sql = "SELECT * FROM Item WHERE Item_Type = 'italian'";
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>italian</title>
+    <title>Italian</title>
 </head>
 
 <style>
-    body {
+body {
     font-family: Arial, sans-serif;
     background: #fff;
-}
-
-.title {
-    text-align: center;
-    font-size: 40px;
-    margin-top: 20px;
-    color: #3a1f14;
 }
 
 .container {
@@ -60,13 +55,13 @@ $result = $conn->query($sql);
     font-weight: 500;
 }
 
+/* FIXED BUTTON (LEFT) */
 .add-btn {
     padding: 7px 15px;
     border-radius: 10px;
     border: 1px solid #000;
     background: #fff;
     cursor: pointer;
-    float: right;
 }
 
 .add-btn:hover {
@@ -74,57 +69,91 @@ $result = $conn->query($sql);
     color: #fff;
 }
 
+/* HEADER EXACT LIKE SALAD */
 .header {
-    background-color: #a05b3d;;
+    background-color: #a05b3d;
     padding: 20px;
-    text-align: center;
     font-size: 28px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    display: flex;    
 }
 
 .logo {
     width: 90px;
-    height: auto;
-}       
+    position: absolute;
+    left: 20px;
+}
+
+.top-right-images {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.img-top {
+    width: 60px;
+}
+
+.img-bottom {
+    width: 50px;
+}
 </style>
 
 <body>
 
-   <div class="header">
-        <img src="images/logo.png" class="logo">
-        <h1>Italian</h1>
+<!-- HEADER -->
+<div class="header">
+    <img src="images/logo.png" class="logo">
+    <h1>Italian</h1>
+
+    <div class="top-right-images">
+        <a href="checkout.php">
+            <img class="img-top" src="images/shopping_cart.png" alt="cart">
+        </a>
+        <a href="checkout.php">
+            <img class="img-bottom" src="images/checkout.png" alt="checkout">
+        </a>
     </div>
+</div>
 
 <div class="container">
 
 <?php
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                // Sanitize output to prevent XSS
-                $itemName = htmlspecialchars($row['Item_Name']);
-                $itemPrice = htmlspecialchars($row['Item_Price']);
-                $itemImage = htmlspecialchars($row['Item_Image']);
-                
-                $imagePath = "images/" . $itemImage;
+if (!empty($items)) {
+    foreach ($items as $row) {
 
-                echo "
-                <div class='card'>
-                    <img src='$imagePath' alt='$itemName' class='item-img'>
-                    <h3 class='item-name'>$itemName</h3>
-                    <p class='price'>Rs $itemPrice</p>
-                    <button class='add-btn'>Add To Cart</button>
-                </div>
-                ";
-            }
-        } else {
-            echo "<p>No salads found.</p>";
-        }
+        $itemName = htmlspecialchars($row['Item_Name']);
+        $itemPrice = htmlspecialchars($row['Item_Price']);
+        $itemImage = htmlspecialchars($row['Item_Image']);
+        $itemID = $row['Item_ID'];
 
-                // Close the connection
-        $conn->close();
-        ?>
+        $imagePath = "images/" . $itemImage;
+
+        echo "
+        <div class='card'>
+            <img src='$imagePath' alt='$itemName' class='item-img'>
+            <h3 class='item-name'>$itemName</h3>
+            <p class='price'>Rs $itemPrice</p>
+
+            <form action='add_to_cart.php' method='POST'>
+                <input type='hidden' name='item_id' value='$itemID'>
+                <button type='submit' class='add-btn'>Add To Cart</button>
+            </form>
+        </div>
+        ";
+    }
+} else {
+    echo "<p>No italian items found.</p>";
+}
+
+$conn = null;
+?>
 
 </div>
 
