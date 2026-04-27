@@ -2,11 +2,13 @@
 session_start();
 include 'includes/db_connect.php';
 
+// PDO (correct way)
 $sql = "SELECT * FROM Item WHERE Item_Type = 'seafood'";
-$result = $conn->query($sql);
-
-
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -92,7 +94,7 @@ $result = $conn->query($sql);
 
     .checkout-box a {
         text-decoration: none;
-        color: black !important;   /* FIXED — NOW BLACK */
+        color: black;
         font-size: 20px;
         font-weight: 600;
     }
@@ -123,14 +125,15 @@ $result = $conn->query($sql);
 <div class="container">
 
 <?php
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if (!empty($items)) {
+    foreach ($items as $row) {
 
         $itemName = htmlspecialchars($row['Item_Name']);
         $itemPrice = htmlspecialchars($row['Item_Price']);
         $itemImage = htmlspecialchars($row['Item_Image']);
-        $imagePath = "images/" . $itemImage;
         $itemID = $row['Item_ID'];
+
+        $imagePath = "images/" . $itemImage;
 
         echo "
         <div class='card'>
@@ -148,7 +151,9 @@ if ($result->num_rows > 0) {
 } else {
     echo "<p>No seafood items found.</p>";
 }
-$conn->close();
+
+// correct PDO close
+$conn = null;
 ?>
 
 </div>
