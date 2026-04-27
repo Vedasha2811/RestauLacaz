@@ -52,6 +52,7 @@
             font-weight: bold;
             text-decoration: underline;
         }
+
         .category-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -59,6 +60,7 @@
             justify-items: center;
             padding: 0 40px;
         }
+
         .category {
             text-align: center;
         }
@@ -81,11 +83,13 @@
             font-weight: bold;
             text-decoration: underline;
         }
+
         .review-cards {
             display: flex;
             gap: 20px;
             margin-top: 20px;
         }
+
         .card {
             border: 1px solid #ddd;
             border-radius: 10px;
@@ -129,7 +133,7 @@
     <div class="category">
         <a href="italian.php">
             <img src="images/Italian.jpg">
-             <p>Italian</p>
+            <p>Italian</p>
         </a>
     </div>
 
@@ -162,22 +166,21 @@
     </div>
 
     <div class="category">
-        <a href = "salad.php">
+        <a href="salad.php">
             <img src="images/salad.jpg">
             <p>Salad</p>
         </a>
-       
     </div>
 
     <div class="category">
-        <a href = "drinks.php">
+        <a href="drinks.php">
             <img src="images/drinks.jpg">
             <p>Drinks</p>
         </a>
     </div>
 
     <div class="category">
-        <a href = "dessert.php">
+        <a href="dessert.php">
             <img src="images/dessert.jpg">
             <p>Dessert</p>
         </a>
@@ -185,11 +188,18 @@
 
 </div>
 
+<!-- REVIEW SECTION -->
 <div class="reviews">
-    <h2>Review</h2>
+
+    <h2>
+        <a href="add_review.php" style="text-decoration:none; color:black;">
+            Review(click me to Add review)
+        </a>
+    </h2>
 
     <div class="review-cards">
 
+        <!-- STATIC -->
         <div class="card">
             ⭐⭐⭐⭐⭐
             <h3>Quick delivery</h3>
@@ -204,19 +214,35 @@
             <small>– Vedasha<br>15.10.25</small>
         </div>
 
-        <div class="card">
-            ⭐⭐⭐⭐☆
-            <h3>Review title</h3>
-            <p>Review body</p>
-            <small>Reviewer name<br>Date</small>
-        </div>
+        <!-- DYNAMIC -->
+        <?php
+        try {
+            $conn = new PDO("mysql:host=localhost;dbname=restaulakaz", "root", "");
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        <div class="card">
-            ⭐⭐⭐⭐☆
-            <h3>Review title</h3>
-            <p>Review body</p>
-            <small>Reviewer name<br>Date</small>
-        </div>
+            $stmt = $conn->query("SELECT * FROM reviews ORDER BY id DESC LIMIT 2");
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+                echo "<div class='card'>";
+
+                for ($i = 0; $i < $row['rating']; $i++) {
+                    echo "⭐";
+                }
+
+                echo "<h3>" . htmlspecialchars($row['title']) . "</h3>";
+                echo "<p>" . htmlspecialchars($row['comment']) . "</p>";
+                echo "<small>– " . htmlspecialchars($row['name']) . "<br>" . $row['date'] . "</small>";
+
+                echo "</div>";
+            }
+
+            $conn = null;
+
+        } catch (PDOException $e) {
+            echo "<p>Error loading reviews</p>";
+        }
+        ?>
 
     </div>
 </div>
