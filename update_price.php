@@ -1,24 +1,21 @@
 <?php
+session_start();
+
+// ONLY ADMIN
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    die("Access denied");
+}
+
 include 'includes/db_connect.php';
 
-if (isset($_POST['item_id']) && isset($_POST['new_price'])) {
+$itemID = $_POST['item_id'];
+$newPrice = $_POST['new_price'];
 
-    $itemID = $_POST['item_id'];
-    $newPrice = $_POST['new_price'];
+$stmt = $conn->prepare("UPDATE Item SET Item_Price = ? WHERE Item_ID = ?");
+$stmt->execute([$newPrice, $itemID]);
 
-    // validation
-    if ($newPrice > 0) {
+$conn = null;
 
-        $sql = "UPDATE Item SET Item_Price = ? WHERE Item_ID = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$newPrice, $itemID]);
-
-        // redirect back
-        header("Location: admin_seafood.php");
-        exit();
-
-    } else {
-        echo "Invalid price!";
-    }
-}
+header("Location: admin_seafood.php");
+exit();
 ?>
