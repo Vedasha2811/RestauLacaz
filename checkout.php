@@ -1,27 +1,64 @@
 <?php
-require 'includes/db_connect.php';
+session_start();
+include 'includes/db_connect.php';
 
-$grand_total = 0;
-$allItems = '';
-$items = [];
-
-$sql = "SELECT Item_Name, qty, Item_Price, total_price FROM cart";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-
-$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$cart_items = [];
-
-foreach ($result as $row) {
-  $grand_total += $row['total_price'];
-  $cart_items[] = $row;
-  $items[] = $row['Item_Name'] . "(" . $row['qty'] . ")";
-}
-
-$allItems = implode(', ', $items);
 $delivery = 200;
-$totalAmount = $grand_total + $delivery;
+$grandTotal = 0;
+
+// Calculate total
+if (isset($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $grandTotal += $item['price'] * $item['quantity'];
+    }
+}
+$totalAmount = $grandTotal + $delivery;
+
+// Date & time
+$date = date('Y-m-d');
+$time = date('H:i:s');
+
+// Customer ID
+$customerID = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : 0;
+
+// Process order
+$error = "";
+$success = false;
+
+if (isset($_POST['pay'])) {
+    $region = htmlspecialchars($_POST['region']);
+    $street = htmlspecialchars($_POST['street']);
+    $phone = htmlspecialchars($_POST['phone']);
+    $orderStatus = "Pending";
+
+    // Validate phone
+    if (!preg_match('/^5\d{7}$/', $phone)) {
+        $error = "Invalid phone number. Must be 8 digits starting with 5";
+    } else {
+        try {
+            $stmt = $conn->prepare("INSERT INTO orders 
+            (Date, Time, Total_Amount, Order_Status, Region_Name, Street_Name, Phone, Customer_ID) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+            $stmt->execute([
+                $date,
+                $time,
+                $totalAmount,
+                $orderStatus,
+                $region,
+                $street,
+                $phone,
+                $customerID
+            ]);
+
+            // Clear cart
+            unset($_SESSION['cart']);
+            $success = true;
+
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,117 +68,63 @@ $totalAmount = $grand_total + $delivery;
 <title>Checkout</title>
 
 <style>
-body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 30px; }
-.checkout-container { background: white; padding: 25px; width: 600px; margin: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-h2 { margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-table th, table td { text-align: left; padding: 10px 0; }
-.total-line { text-align: center; font-size: 18px; margin: 20px 0; }
-.section-title { margin-top: 25px; font-weight: bold; }
-input, select { width: 48%; padding: 10px; margin: 5px 1%; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
-.full-width { width: 98%; }
-button { width: 200px; margin: 20px auto; display: block; padding: 12px; background: #9c583a; color: white; border: none; border-radius: 20px; font-size: 16px; cursor: pointer; }
-button:hover { background: #7f462f; }
-.error { color: red; margin: 10px 0; text-align: center; }
+body { font-family: Arial; background: #f7f7f7; padding: 30px; }
+.checkout-container { background: white; padding: 25px; width: 600px; margin: auto; border-radius: 10px; }
+table { width: 100%; margin-bottom: 10px; }
+th, td { padding: 10px; }
+button { padding: 12px; background: #9c583a; color: white; border: none; border-radius: 20px; cursor: pointer; }
+.error { color: red; text-align: center; }
+.success { color: green; text-align: center; font-weight: bold; }
 </style>
 
 </head>
 <body>
 
 <div class="checkout-container">
-<div id="order"></div>a
 <h2>Checkout</h2>
 
-<!-- Order Summary -->
 <table>
 <tr>
 <th>Item</th>
-<th>Quantity</th>
+<th>Qty</th>
 <th>Price</th>
 <th>Total</th>
 </tr>
 
-<?php foreach ($cart_items as $item): ?>
-<tr>
-<td><?= $item['Item_Name'] ?></td>
-<td><?= $item['qty'] ?></td>
-<td>Rs <?= $item['Item_Price'] ?></td>
-<td>Rs <?= $item['total_price'] ?></td>
-</tr>
-<?php endforeach; ?>
-
+<?php
+if (isset($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $total = $item['price'] * $item['quantity'];
+        echo "<tr>
+            <td>{$item['name']}</td>
+            <td>{$item['quantity']}</td>
+            <td>Rs {$item['price']}</td>
+            <td>Rs $total</td>
+        </tr>";
+    }
+}
+?>
 </table>
 
-<div class="total-line">
-Grand Total: Rs <?= $grand_total; ?>
-+ Rs <?= $delivery; ?> Delivery =
-<b>Rs <?= $totalAmount; ?></b>
-</div>
+<p><b>Total: Rs <?php echo $totalAmount; ?></b></p>
 
-<!-- Checkout Form -->
-<form id="placeOrder">
+<?php if ($error): ?>
+    <p class="error"><?php echo $error; ?></p>
+<?php endif; ?>
 
-<input type="hidden" name="products" value="<?= $allItems; ?>">
-<input type="hidden" name="grand_total" value="<?= $grand_total; ?>">
+<?php if ($success): ?>
+    <p class="success">✔ Order placed successfully!</p>
+<?php endif; ?>
 
-<div class="section-title">Delivery Information</div>
-<input type="text" name="name" placeholder="Full Name" required>
-<input type="text" name="region" placeholder="Region" required><br>
-<input type="text" name="street" placeholder="Street Address" required>
-<input type="email" name="email" placeholder="Email" required><br>
-<input type="text" name="phone" id="phone" placeholder="Phone Number" class="full-width" required>
+<form method="POST">
+    <input type="text" name="region" placeholder="Region" required><br><br>
+    <input type="text" name="street" placeholder="Street" required><br><br>
+    <input type="text" name="phone" placeholder="Phone (5xxxxxxx)" required><br><br>
 
-<div id="phone-error" class="error"></div>
-
-<div class="section-title">Payment</div>
-<select name="pmode" class="full-width">
-<option value="cod">Cash on Delivery</option>
-<option value="netbanking">Net Banking</option>
-<option value="cards">Card</option>
-</select>
-
-<button type="submit" id = "placeOrder">Place Order</button>
-
+    <button type="submit" name="pay">Pay</button>
 </form>
 
 </div>
-
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js'></script>
-
-  <script type="text/javascript">
-  $(document).ready(function() {
-
-    // Sending Form data to the server
-    $("#placeOrder").submit(function(e) {
-      e.preventDefault();
-      $.ajax({
-        url: 'action.php',
-        method: 'post',
-        data: $('form').serialize() + "&action=order",
-        success: function(response) {
-          $("#order").html(response);
-        }
-      });
-    });
-
-    // Load total no.of items added in the cart and display in the navbar
-    load_cart_item_number();
-
-    function load_cart_item_number() {
-      $.ajax({
-        url: 'action.php',
-        method: 'get',
-        data: {
-          cartItem: "cart_item"
-        },
-        success: function(response) {
-          $("#cart-item").html(response);
-        }
-      });
-    }
-  });
-  </script>
 
 </body>
 </html>
