@@ -1,120 +1,146 @@
-n.php (corrected login with lockout)
 <?php
 session_start();
 require_once "includes/db_connect.php";
 
-// Initialize attempts
-if (!isset($_SESSION['attempts'])) $_SESSION['attempts'] = 0;
-
-$maxAttempts = 5;      // max tries
-$lockTime = 60;        // lock seconds
-
-
-if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
-    $remaining = $_SESSION['lock_time'] - time();
-    die("<p style='color:red;'>Too many attempts. Try again in $remaining seconds.</p>");
+  /* LOGIN ATTEMPT CONTROL
+*/
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
 }
 
+$maxAttempts = 5;
+$lockTime = 60;
+
+/* 
+   CHECK LOCK STATUS
+*/
+if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
+    $remaining = $_SESSION['lock_time'] - time();
+    die("<p style='color:red; text-align:center;'>
+        Too many attempts. Try again in $remaining seconds.
+    </p>");
+}
+
+/* 
+   ERROR VARIABLES
+*/
 $emailErr = $passwordErr = "";
 $email = $password = "";
 
+/* 
+   LOGIN PROCESS
+*/
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     $email = trim($_POST["txt_email"]);
     $password = trim($_POST["txt_password"]);
 
-    if (empty($email)) $emailErr = "Email is required";
-    if (empty($password)) $passwordErr = "Password is required";
+    if (empty($email)) {
+        $emailErr = "Email is required";
+    }
+
+    if (empty($password)) {
+        $passwordErr = "Password is required";
+    }
 
     if ($emailErr == "" && $passwordErr == "") {
-    
-        $stmt = $conn->prepare("SELECT * FROM customer WHERE email = :email");
+
+        /* 
+           CHANGE TABLE HERE IF NEEDED
+           admin OR customer
+         */
+
+        // 👉 LOGIN FROM ADMIN TABLE
+        $stmt = $conn->prepare("SELECT * FROM admin WHERE email = :email");
         $stmt->execute(['email' => $email]);
-        $userResults = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($userResults) {
-            $hashed_password = $userResults['password'];
+        if ($user) {
 
-            if (password_verify($password, $hashed_password)) {
-                // Successful login
+            if (password_verify($password, $user['password'])) {
+
+                // SUCCESS LOGIN
                 $_SESSION['attempts'] = 0;
                 unset($_SESSION['lock_time']);
-                $_SESSION['email'] = $email;
 
-                header("Location: home.php?referer=login");
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = "admin";
+
+                header("Location: home.php?login=success");
                 exit();
+
             } else {
                 $_SESSION['attempts']++;
-                if ($_SESSION['attempts'] >= $maxAttempts) {
-                    $_SESSION['lock_time'] = time() + $lockTime;
-                    echo "<p style='color:red;'>Too many incorrect attempts. Locked for $lockTime seconds.</p>";
-                } else {
-                    echo "<p style='color:red;'>Wrong password. Attempts: {$_SESSION['attempts']}/$maxAttempts</p>";
-                }
+                handleAttempts();
             }
+
         } else {
             $_SESSION['attempts']++;
-            if ($_SESSION['attempts'] >= $maxAttempts) {
-                $_SESSION['lock_time'] = time() + $lockTime;
-                echo "<p style='color:red;'>Too many incorrect attempts. Locked for $lockTime seconds.</p>";
-            } else {
-                echo "<p style='color:red;'>Email not found. Attempts: {$_SESSION['attempts']}/$maxAttempts</p>";
-            }
+            handleAttempts("Email not found");
         }
+    }
+}
+
+/*
+   LOCK FUNCTION
+ */
+function handleAttempts($msg = "Wrong credentials")
+{
+    global $maxAttempts, $lockTime;
+
+    if ($_SESSION['attempts'] >= $maxAttempts) {
+        $_SESSION['lock_time'] = time() + $lockTime;
+        die("<p style='color:red; text-align:center;'>
+            Too many incorrect attempts. Locked for $lockTime seconds.
+        </p>");
+    } else {
+        echo "<p style='color:red; text-align:center;'>
+            $msg. Attempts: {$_SESSION['attempts']}/$maxAttempts
+        </p>";
     }
 }
 ?>
 
+<!--
+     HTML LOGIN FORM
+ -->
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
+    <title>Login</title>
 
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
+        body { margin: 0; font-family: Arial; }
         .container { display: flex; height: 100vh; }
 
         .left { width: 50%; }
         .left img { width: 100%; height: 100%; object-fit: cover; }
 
-        .right { width: 50%; padding: 50px 80px; position: relative; }
+        .right { width: 50%; padding: 50px; position: relative; }
+
         .login-btn {
             position: absolute; right: 60px; top: 20px;
-            padding: 10px 30px; background: #9b4d37; color: white;
-            border: none; border-radius: 30px; font-size: 16px;
+            padding: 10px 30px; background: #9b4d37;
+            color: white; border: none; border-radius: 30px;
         }
 
         input {
-            width: 100%; padding: 12px 15px; margin-top: 15px;
-            border: 1px solid #e0e0e0; border-radius: 25px; font-size: 16px;
+            width: 100%; padding: 12px; margin-top: 10px;
+            border-radius: 25px; border: 1px solid #ccc;
         }
 
         .submit-btn {
-            width: 100%; padding: 12px; margin-top: 30px;
-            background: #9b4d37; color: white; border: none;
-            border-radius: 25px; font-size: 18px; cursor: pointer;
+            width: 100%; margin-top: 20px;
+            padding: 12px; background: #9b4d37;
+            color: white; border: none; border-radius: 25px;
         }
 
-         .input-group {
-        width: 100%;
-        }
-
-        .input-group label {
-        display: block;
-        margin: 0 0 5px 0;  
-        padding: 0;         
-        text-align: left;   
-        font-weight: bold;
-        }
+        .input-group { margin-bottom: 15px; }
+        .error { color: red; font-size: 12px; }
     </style>
 </head>
 
 <body>
-
-<?php
-    $activemenu ="login";
-    include('includes/menu.php');
-?>
 
 <div class="container">
 
@@ -123,46 +149,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="right">
-    <a href="signin.php"><button class="login-btn">Sign Up</button></a>
-    
-    <?php
-    if(isset($_SESSION['email']))
-    { 
-        echo "<h3 style=\"color:red\">You are already logged in</h3>";
-        
-    }//end if
-    else
-    {	  
-    ?>    
 
-    <h1>Log In</h1>
+        <a href="signin.php">
+            <button class="login-btn">Sign Up</button>
+        </a>
 
-        <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
-        <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" name="txt_email" placeholder="Email" required>
-            <span class="error">* <?php echo $emailErr;?></span><br/><br/> 
-        </div>
+        <?php
+        if (isset($_SESSION['email'])) {
+            echo "<h3 style='color:green;'>You are already logged in</h3>";
+        } else {
+        ?>
 
-        <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" name="txt_password" placeholder="Password" required>
-            <span class="error">* <?php echo $passwordErr;?></span><br/><br/> 
-        </div>
+        <h1>Login</h1>
 
-        <button class="submit-btn">Log In</button>
+        <form method="POST">
 
-        <p style="text-align:center; margin-top:10px;">
-             Don't have an account? <a href="signin.php">Create One</a>
-        </p>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="txt_email" required>
+                <span class="error"><?php echo $emailErr; ?></span>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="txt_password" required>
+                <span class="error"><?php echo $passwordErr; ?></span>
+            </div>
+
+            <button class="submit-btn">Log In</button>
 
         </form>
-    <?php
-    }
-    ?>
+
+        <?php } ?>
 
     </div>
 </div>
+
 </body>
 </html>
-
