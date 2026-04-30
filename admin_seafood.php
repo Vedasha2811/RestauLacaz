@@ -1,7 +1,15 @@
 <?php
+session_start();
+
+// BLOCK NON-ADMIN
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    header("Location: seafood.php");
+    exit();
+}
+
 include 'includes/db_connect.php';
 
-// Fetch seafood items
+// FETCH ITEMS
 $sql = "SELECT * FROM Item WHERE Item_Type = 'seafood'";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -15,12 +23,8 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <style>
-body {
-    font-family: Arial;
-    background: #f4f4f4;
-}
+body { font-family: Arial; background: #f4f4f4; }
 
-/* HEADER */
 .header {
     background: #a05b3d;
     padding: 20px;
@@ -30,7 +34,6 @@ body {
     font-weight: bold;
 }
 
-/* GRID */
 .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -38,32 +41,18 @@ body {
     padding: 30px;
 }
 
-/* CARD */
 .card {
     background: #fff;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .item-img {
     width: 100%;
     height: 160px;
     object-fit: cover;
-    border-radius: 10px;
 }
 
-.item-name {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.price {
-    margin: 10px 0;
-}
-
-/* FORM */
 input {
     width: 80px;
     padding: 5px;
@@ -74,18 +63,12 @@ button {
     background: #a05b3d;
     color: white;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #7c432c;
 }
 </style>
 
 <body>
 
-<div class="header">Admin Panel - Seafood Items</div>
+<div class="header">Admin Panel - Seafood</div>
 
 <div class="container">
 
@@ -93,24 +76,19 @@ button:hover {
 foreach ($items as $row) {
 
     $itemID = $row['Item_ID'];
-    $itemName = htmlspecialchars($row['Item_Name']);
-    $itemPrice = htmlspecialchars($row['Item_Price']);
-    $itemImage = htmlspecialchars($row['Item_Image']);
-    $imagePath = "images/" . $itemImage;
+    $name = htmlspecialchars($row['Item_Name']);
+    $price = htmlspecialchars($row['Item_Price']);
+    $img = "images/" . $row['Item_Image'];
 
     echo "
     <div class='card'>
-        <img src='$imagePath' class='item-img'>
-
-        <div class='item-name'>$itemName</div>
-        <div class='price'>Current Price: Rs $itemPrice</div>
+        <img src='$img' class='item-img'>
+        <h3>$name</h3>
+        <p>Current Price: Rs $price</p>
 
         <form action='update_price.php' method='POST'>
             <input type='hidden' name='item_id' value='$itemID'>
-
-            New Price:
             <input type='number' name='new_price' required>
-
             <button type='submit'>Update</button>
         </form>
     </div>
