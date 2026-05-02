@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 28, 2026 at 10:09 AM
+-- Generation Time: May 02, 2026 at 12:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -49,8 +49,19 @@ CREATE TABLE `cart` (
   `Item_Price` decimal(10,2) DEFAULT NULL,
   `Item_Image` varchar(255) DEFAULT NULL,
   `qty` int(11) DEFAULT NULL,
-  `total_price` decimal(10,2) DEFAULT NULL
+  `total_price` decimal(10,2) DEFAULT NULL,
+  `Customer_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`id`, `session_id`, `Item_ID`, `Item_Name`, `Item_Price`, `Item_Image`, `qty`, `total_price`, `Customer_ID`) VALUES
+(56, 'asrau766n80oo37j6m6dhgdn69', 205, 'Crab Clusters Soup', 450.00, 'sea5.png', 1, 450.00, 15),
+(57, 'asrau766n80oo37j6m6dhgdn69', 203, 'Fish and Chip', 400.00, 'sea3.png', 1, 400.00, 15),
+(58, 'asrau766n80oo37j6m6dhgdn69', 201, 'Pawn and Mussel', 400.00, 'sea1.png', 1, 400.00, NULL),
+(59, 'asrau766n80oo37j6m6dhgdn69', 202, 'Platter for one', 650.00, 'sea2.png', 1, 650.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -63,7 +74,7 @@ CREATE TABLE `customer` (
   `First_Name` varchar(50) DEFAULT NULL,
   `Last_Name` varchar(50) DEFAULT NULL,
   `email` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
-  `password` varchar(30) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL
+  `password` varchar(255) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -71,7 +82,7 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`Customer_ID`, `First_Name`, `Last_Name`, `email`, `password`) VALUES
-(10, 'vedasha', 'beeputh', 'vedashabeeputh@gmail.com', '$2y$10$qgjTjcRIDoL5301njmXKTe9');
+(15, 'vedasha', 'beeputh', 'vedashabeeputh@gmail.com', '$2y$10$5vdTjzTlpqFL7vTSNQ.2UepPa1jZ/VbXC.bd3TCT9yB0xld202C2.');
 
 -- --------------------------------------------------------
 
@@ -162,6 +173,13 @@ CREATE TABLE `orders` (
   `Customer_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`Order_ID`, `Date`, `Time`, `Total_Amount`, `Order_Status`, `Region_Name`, `Street_Name`, `Phone`, `Customer_ID`) VALUES
+(14, '2026-05-02', '14:03:19', 1050.00, 'Pending', 'BelAir', 'Royal Road', '51234561', 15);
+
 -- --------------------------------------------------------
 
 --
@@ -240,19 +258,19 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `Customer_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `Customer_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `reviews`
