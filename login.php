@@ -1,146 +1,144 @@
 <?php
+// Start the session
+//The session_start() function must be the very first thing in your document. Before any HTML tags.
 session_start();
+
 require_once "includes/db_connect.php";
 
-  /* LOGIN ATTEMPT CONTROL
-*/
-if (!isset($_SESSION['attempts'])) {
-    $_SESSION['attempts'] = 0;
-}
 
-$maxAttempts = 5;
-$lockTime = 60;
+// define variables and set to empty string values
 
-/* 
-   CHECK LOCK STATUS
-*/
-if (isset($_SESSION['lock_time']) && time() < $_SESSION['lock_time']) {
-    $remaining = $_SESSION['lock_time'] - time();
-    die("<p style='color:red; text-align:center;'>
-        Too many attempts. Try again in $remaining seconds.
-    </p>");
-}
-
-/* 
-   ERROR VARIABLES
-*/
 $emailErr = $passwordErr = "";
-$email = $password = "";
+$email = $password =  "";
 
-/* 
-   LOGIN PROCESS
-*/
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST["txt_email"])) {
+    $emailErr = "email is required";
+  } else {
+    $email= $_POST["txt_email"];
+  }//end else
+  if (empty($_POST["txt_password"])) {
+    $passwordErr = "Password is required";
+  } else {
+    $password= $_POST["txt_password"];
+   
+  }//end else
+  
+ if ($emailErr == "" && $passwordErr == "") {
 
-    $email = trim($_POST["txt_email"]);
-    $password = trim($_POST["txt_password"]);
+        try {
+            // Prepare statement (secure)
+            $stmt = $conn->prepare("
+                SELECT Customer_ID, First_Name, Last_Name, email, password
+                FROM customer
+                WHERE email = :email
+                LIMIT 1
+            ");
 
-    if (empty($email)) {
-        $emailErr = "Email is required";
-    }
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
 
-    if (empty($password)) {
-        $passwordErr = "Password is required";
-    }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($emailErr == "" && $passwordErr == "") {
+            if ($user) {
 
-        /* 
-           CHANGE TABLE HERE IF NEEDED
-           admin OR customer
-         */
+                $hashed_password = $user['password'];
 
-        // 👉 LOGIN FROM ADMIN TABLE
-        $stmt = $conn->prepare("SELECT * FROM admin WHERE email = :email");
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                // DEBUG (remove after testing)
+                // var_dump($password);
+                // var_dump($hashed_password);
 
-        if ($user) {
+                if (password_verify($password, $hashed_password)) {
 
-            if (password_verify($password, $user['password'])) {
+                    // Regenerate session ID (security)
+                    session_regenerate_id(true);
 
-                // SUCCESS LOGIN
-                $_SESSION['attempts'] = 0;
-                unset($_SESSION['lock_time']);
+                    // Store session data
+                    $_SESSION['customerId'] = $user['Customer_ID'];
+                    $_SESSION['firstName']  = $user['First_Name'];
+                    $_SESSION['lastName']   = $user['Last_Name'];
+                    $_SESSION['email']      = $user['email'];
 
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = "admin";
+                    //MERGE GUEST CART INTO USER CART
+                    $session_id = session_id();
+                    $customer_id = $_SESSION['customerId'];
 
-                header("Location: home.php?login=success");
-                exit();
+                    $update = $conn->prepare("
+                        UPDATE cart 
+                        SET Customer_ID = ?
+                        WHERE session_id = ? AND Customer_ID IS NULL
+                    ");
+                    $update->execute([$customer_id, $session_id]);
+
+                    header("Location: home.php?referer=login");
+                    exit();
+
+                } else {
+                    echo "Invalid email or password";
+                }
 
             } else {
-                $_SESSION['attempts']++;
-                handleAttempts();
+                echo "Invalid email or password";
             }
 
-        } else {
-            $_SESSION['attempts']++;
-            handleAttempts("Email not found");
+        } catch (PDOException $e) {
+            echo "Database error: " . $e->getMessage();
         }
-    }
-}
-
-/*
-   LOCK FUNCTION
- */
-function handleAttempts($msg = "Wrong credentials")
-{
-    global $maxAttempts, $lockTime;
-
-    if ($_SESSION['attempts'] >= $maxAttempts) {
-        $_SESSION['lock_time'] = time() + $lockTime;
-        die("<p style='color:red; text-align:center;'>
-            Too many incorrect attempts. Locked for $lockTime seconds.
-        </p>");
-    } else {
-        echo "<p style='color:red; text-align:center;'>
-            $msg. Attempts: {$_SESSION['attempts']}/$maxAttempts
-        </p>";
     }
 }
 ?>
 
-<!--
-     HTML LOGIN FORM
- -->
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In</title>
 
     <style>
-        body { margin: 0; font-family: Arial; }
+        body { margin: 0; font-family: Arial, sans-serif; }
         .container { display: flex; height: 100vh; }
 
         .left { width: 50%; }
         .left img { width: 100%; height: 100%; object-fit: cover; }
 
-        .right { width: 50%; padding: 50px; position: relative; }
-
+        .right { width: 50%; padding: 50px 80px; position: relative; }
         .login-btn {
             position: absolute; right: 60px; top: 20px;
-            padding: 10px 30px; background: #9b4d37;
-            color: white; border: none; border-radius: 30px;
+            padding: 10px 30px; background: #9b4d37; color: white;
+            border: none; border-radius: 30px; font-size: 16px;
         }
 
         input {
-            width: 100%; padding: 12px; margin-top: 10px;
-            border-radius: 25px; border: 1px solid #ccc;
+            width: 100%; padding: 12px 15px; margin-top: 15px;
+            border: 1px solid #e0e0e0; border-radius: 25px; font-size: 16px;
         }
 
         .submit-btn {
-            width: 100%; margin-top: 20px;
-            padding: 12px; background: #9b4d37;
-            color: white; border: none; border-radius: 25px;
+            width: 100%; padding: 12px; margin-top: 30px;
+            background: #9b4d37; color: white; border: none;
+            border-radius: 25px; font-size: 18px; cursor: pointer;
         }
 
-        .input-group { margin-bottom: 15px; }
-        .error { color: red; font-size: 12px; }
+         .input-group {
+        width: 100%;
+        }
+
+        .input-group label {
+        display: block;
+        margin: 0 0 5px 0;  
+        padding: 0;         
+        text-align: left;   
+        font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
+
+<?php
+    $activemenu ="login";
+    
+?>
 
 <div class="container">
 
@@ -149,41 +147,46 @@ function handleAttempts($msg = "Wrong credentials")
     </div>
 
     <div class="right">
+    <a href="signin.php"><button class="login-btn">Sign Up</button></a>
+    
+    <?php
+    if(isset($_SESSION['email']))
+    { 
+        echo "<h3 style=\"color:red\">You are already logged in</h3>";
+        
+    }//end if
+    else
+    {	  
+    ?>    
 
-        <a href="signin.php">
-            <button class="login-btn">Sign Up</button>
-        </a>
+    <h1>Log In</h1>
 
-        <?php
-        if (isset($_SESSION['email'])) {
-            echo "<h3 style='color:green;'>You are already logged in</h3>";
-        } else {
-        ?>
+        <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" name="txt_email" placeholder="Email" required>
+            <span class="error">* <?php echo $emailErr;?></span><br/><br/> 
+        </div>
 
-        <h1>Login</h1>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" name="txt_password" placeholder="Password" required>
+            <span class="error">* <?php echo $passwordErr;?></span><br/><br/> 
+        </div>
 
-        <form method="POST">
+        <button class="submit-btn">Log In</button>
 
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="txt_email" required>
-                <span class="error"><?php echo $emailErr; ?></span>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" name="txt_password" required>
-                <span class="error"><?php echo $passwordErr; ?></span>
-            </div>
-
-            <button class="submit-btn">Log In</button>
+        <p style="text-align:center; margin-top:10px;">
+             Don't have an account? <a href="signin.php">Create One</a>
+        </p>
 
         </form>
-
-        <?php } ?>
+    <?php
+    }
+    ?>
 
     </div>
 </div>
-
 </body>
 </html>
+
